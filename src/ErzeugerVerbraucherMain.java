@@ -1,22 +1,37 @@
-import java.util.Stack;
 import java.util.logging.*;
+import java.util.ArrayList;
 import java.util.HashMap;
-
 
 public class ErzeugerVerbraucherMain {
 	private final static Logger LOG = Logger
 			.getLogger(ErzeugerVerbraucherMain.class.getName());
 
 	public static void main(String[] args) {
-		Stack<HashMap> sharedStack = new Stack<HashMap>();
-		final Integer LIMIT = 8;
-		LOG.info("Fixed sized list created");
+		Integer limit = 8;
+		Integer erzeugerAmount = 5;
+		Integer verbraucherAmount = 5;
 		
-		Thread erzeuger = new Thread(new Erzeuger(sharedStack, LIMIT));
-		Thread verbraucher = new Thread(new Verbraucher(sharedStack, LIMIT));
+		LimitStack<HashMap<String, Integer>> sharedStack = new LimitStack<HashMap<String, Integer>>(limit);
+		LOG.info("Stack mit Limit " + limit + " erzeugt");
+		ArrayList<Thread> erzeuger = new ArrayList<Thread>();
+		for(int i = 0; i<erzeugerAmount; i++) {
+			erzeuger.add(i, new Thread(new Erzeuger(sharedStack)));
+		}
 		
-		erzeuger.start();
-		verbraucher.start();
+		ArrayList<Thread> verbraucher = new ArrayList<Thread>();
+		for(int i = 0; i<verbraucherAmount; i++) {
+			verbraucher.add(i, new Thread(new Verbraucher(sharedStack)));
+		}
+
+		for(Thread t: erzeuger) {
+			t.start();
+		}
 		
+		for(Thread t: verbraucher) {
+			t.start();
+		}
+
+		
+
 	}
 }
