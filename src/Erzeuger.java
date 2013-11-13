@@ -1,9 +1,6 @@
 import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
 import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Erzeuger implements Runnable {
 	private final static Logger LOG = Logger
