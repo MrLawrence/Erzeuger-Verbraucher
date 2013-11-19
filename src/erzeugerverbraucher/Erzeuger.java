@@ -23,25 +23,8 @@ public class Erzeuger implements Runnable {
 
 	public void run() {
 		LOG.info(this.toString() + " gestartet");
-
 		while (true) {
-			synchronized (sharedStack) {
-				while (sharedStack.full()) {
-					try {
-						sharedStack.wait(20);
-					} catch (InterruptedException e) {
-						Thread.interrupted();
-					}
-				}
-				erzeuge();
-				sharedStack.notifyAll();
-
-			}
-			try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			erzeuge();
 		}
 	}
 

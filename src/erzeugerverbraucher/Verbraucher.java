@@ -1,6 +1,5 @@
 package erzeugerverbraucher;
 
-
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -23,26 +22,18 @@ public class Verbraucher implements Runnable {
 
 	public void run() {
 		LOG.info(this.toString() + " gestartet");
-		
+
 		while (true) {
-			synchronized (sharedStack) {
-				while (sharedStack.empty()) {
-					try {
-						sharedStack.wait(20);
-					} catch (InterruptedException e) {
-						Thread.interrupted();
-					}
-				}
-				verbrauche();
-				sharedStack.notifyAll();
-			}
+			verbrauche();
 		}
 	}
 
 	private void verbrauche() {
 		data = sharedStack.pop();
-		LOG.info(this.toString() + ":\t" + data.get("erzeugerId") + 'x'
-				+ data.get("writeId") + " entnommen");
+		if (data != null) {
+			LOG.info(this.toString() + ":\t" + data.get("erzeugerId") + 'x'
+					+ data.get("writeId") + " entnommen");
+		}
 	}
 
 	public String toString() {
