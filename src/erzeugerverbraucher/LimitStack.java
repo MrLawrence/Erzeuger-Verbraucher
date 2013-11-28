@@ -21,7 +21,7 @@ public class LimitStack<E> extends Stack<E> {
 	public E push(E item) {
 		try {
 			mutex.acquire();
-			if (super.size() < limit) {
+			if (this.size() < limit) {
 				super.push(item);
 			} else {
 				LOG.info("Can't push: Stack full");
@@ -55,7 +55,7 @@ public class LimitStack<E> extends Stack<E> {
 	}
 
 	public boolean full() {
-		return size() == limit;
+		return this.size() == limit;
 	}
 
 	@Override
