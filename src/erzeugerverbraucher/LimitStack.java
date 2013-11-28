@@ -24,7 +24,7 @@ public class LimitStack<E> extends Stack<E> {
 			if (super.size() < limit) {
 				super.push(item);
 			} else {
-				LOG.info("Can't push: Stack fukk");
+				LOG.info("Can't push: Stack full");
 			}
 			mutex.release();
 		} catch (InterruptedException e) {
