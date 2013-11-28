@@ -33,6 +33,5 @@ public class ErzeugerVerbraucherMain {
 		for (Thread t : verbraucher) {
 			t.start();
 		}
-
 	}
 }
