@@ -18,41 +18,41 @@ public class LimitStack<E> extends Stack<E> {
 	public LimitStack(Integer limit) {
 		super();
 		this.limit = limit;
-		freeSlots = new Semaphore(this.limit, true);
-		filledSlots = new Semaphore(0, true);
+		this.freeSlots = new Semaphore(this.limit, true);
+		this.filledSlots = new Semaphore(0, true);
 	}
 
 	@Override
 	public E push(E item) {
 		try {
-			freeSlots.acquire();
+			this.freeSlots.acquire();
 
 		} catch (InterruptedException e) {
 			LOG.info("Interrupted");
 		}
 
-		access.lock();
+		this.access.lock();
 		super.push(item);
-		access.unlock();
+		this.access.unlock();
 
-		filledSlots.release();
+		this.filledSlots.release();
 		return item;
 	}
 
 	@Override
 	public E pop() {
-		E item = null;
+		E item;
 		try {
 			filledSlots.acquire();
 		} catch (InterruptedException e) {
 			LOG.info("Interrupted");
 		}
-		
-		access.lock();
+
+		this.access.lock();
 		item = super.pop();
-		access.unlock();
-		
-		freeSlots.release();
+		this.access.unlock();
+
+		this.freeSlots.release();
 		return item;
 	}
 
@@ -61,7 +61,7 @@ public class LimitStack<E> extends Stack<E> {
 	}
 
 	public boolean full() {
-		return this.size() == limit;
+		return this.size() == this.limit;
 	}
 
 	@Override
