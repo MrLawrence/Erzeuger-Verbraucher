@@ -2,6 +2,7 @@ package erzeugerverbraucher;
 
 import java.util.Stack;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public class LimitStack<E> extends Stack<E> {
@@ -9,27 +10,32 @@ public class LimitStack<E> extends Stack<E> {
 	private final static Logger LOG = Logger.getLogger(Verbraucher.class
 			.getName());
 
-	private Semaphore mutex = new Semaphore(1, true);
+	private ReentrantLock access = new ReentrantLock(true);
+	private Semaphore freeSlots;
+	private Semaphore filledSlots;
 	private Integer limit;
 
 	public LimitStack(Integer limit) {
 		super();
 		this.limit = limit;
+		freeSlots = new Semaphore(this.limit, true);
+		filledSlots = new Semaphore(0, true);
 	}
 
 	@Override
 	public E push(E item) {
 		try {
-			mutex.acquire();
-			if (this.size() < limit) {
-				super.push(item);
-			} else {
-				LOG.info("Can't push: Stack full");
-			}
-			mutex.release();
+			freeSlots.acquire();
+
 		} catch (InterruptedException e) {
-			LOG.severe("Interrupted");
+			LOG.info("Interrupted");
 		}
+
+		access.lock();
+		super.push(item);
+		access.unlock();
+
+		filledSlots.release();
 		return item;
 	}
 
@@ -37,16 +43,16 @@ public class LimitStack<E> extends Stack<E> {
 	public E pop() {
 		E item = null;
 		try {
-			mutex.acquire();
-			if (!this.empty()) {
-				item = super.pop();
-			} else {
-				LOG.info("Can't pop: Stack empty");
-			}
-			mutex.release();
+			filledSlots.acquire();
 		} catch (InterruptedException e) {
-			LOG.severe("Interrupted");
+			LOG.info("Interrupted");
 		}
+		
+		access.lock();
+		item = super.pop();
+		access.unlock();
+		
+		freeSlots.release();
 		return item;
 	}
 
